@@ -51,7 +51,7 @@ Edit key - Add sign key
 ![](3_add-auth-subkey.png)
 </details>
 
-<details><summary><b>Step 7: Create revocation certs </b></summary>
+<details><summary><b>[Step 7]: Create revocation certs </b></summary>
 
 Create revocation certs
 ```bash
@@ -64,10 +64,47 @@ Create revocation certs
 ![](4_veryfy-gpg-keys.png)
 </details>
 
-<details><summary><b>Step 10: Configuring the YubiKey(s) </b></summary>
+
+<details><summary><b>Step 9: Backup-restore your key </b></summary>
+
+1. Export keys
+   Replace $KEYID with your GPG key ID:
+```bash
+gpg --export --armor  $KEYID  > $KEYID.pub.asc
+gpg --export-secret-keys --armor $KEYID > $KEYID.priv.asc
+gpg --export-secret-subkeys --armor $KEYID > $KEYID.sub_priv.asc
+gpg --export-ownertrust > ownertrust.txt
+```
+2. Import keys
+```bash
+gpg --import $KEYID.pub.asc
+gpg --import $KEYID.priv.asc
+gpg --import $KEYID.sub_priv.asc
+gpg --import-ownertrust ownertrust.txt
+```
+3. Ultimately trust the imported key:
+```
+gpg --edit-key $KEYID
+gpg> trust
+Your decision? 5
+```
+
+</details>
+
+
+<details><summary><b>Step 10: Install YubiKey software and packages </b></summary>
+
+## Install YubiKey software and packages
+</details>
+
+
+
+<details><summary><b>Step 11: Configuring the YubiKey(s) </b></summary>
 
 ## Configuring the YubiKey(s)
 </details>
+
+
 
 We use the YubiKey Manager to configure the YubiKey(s).
 ## Configure your primary YubiKey
@@ -144,32 +181,6 @@ Slot 2: empty
 
 
 
-
-<details><summary><b>Step 9: Backup-restore your key </b></summary>
-
-1. Export keys
-Replace $KEYID with your GPG key ID:
-```bash
-gpg --export --armor  $KEYID  > $KEYID.pub.asc
-gpg --export-secret-keys --armor $KEYID > $KEYID.priv.asc
-gpg --export-secret-subkeys --armor $KEYID > $KEYID.sub_priv.asc
-gpg --export-ownertrust > ownertrust.txt
-```
-2. Import keys
-```bash
-gpg --import $KEYID.pub.asc
-gpg --import $KEYID.priv.asc
-gpg --import $KEYID.sub_priv.asc
-gpg --import-ownertrust ownertrust.txt
-```
-3. Ultimately trust the imported key:
-```
-gpg --edit-key $KEYID
-gpg> trust
-Your decision? 5
-```
-
-</details>
 
 ---
 <details><summary><b> --- </b></summary></details>
