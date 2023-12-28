@@ -18,16 +18,17 @@ Useful links:
 **[DrDuh manual](https://github.com/drduh/YubiKey-Guide)**
 
 #### Install Yubikey PPA repo:
-
+```bash
 sudo add-apt-repository ppa:yubico/stable && sudo apt-get update
 sudo apt install yubikey-manager yubikey-personalization-gui libpam-yubico libpam-u2f yubikey-manager-qt yubioath-desktop
-
+```
+or ?
+```bash
+sudo apt-get -y install wget gnupg2 gnupg-agent dirmngr cryptsetup scdaemon pcscd secure-delete hopenpgp-tools yubikey-personalization libssl-dev swig libpcsclite-dev python3-pip python3-pyscard
+```
 
 
 possible storages:
  - AWS-S3
  - GH
  - GG-Drive
-
-
-
