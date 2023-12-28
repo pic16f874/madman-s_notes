@@ -1,7 +1,8 @@
 #### Common steps:
 
+
+[Prepare gpg keys](https://github.com/pic16f874/madman-s_notes/blob/master/GPG/README.md)
 ```
-[Prepare gpg keys](GPG/README.md)
 1. create master gpg key
 2. create sign,encrypt,auth subkeys
 3. create revocation cert
