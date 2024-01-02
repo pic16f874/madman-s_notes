@@ -51,13 +51,6 @@ Edit key - Add sign key
 ![](3_add-auth-subkey.png)
 </details>
 
-<details><summary><b>[Step 7]: Create revocation certs </b></summary>
-
-Create revocation certs
-```bash
----
-```
-</details>
 
 <details><summary><b>Step 8: Verify your key generation</b></summary>
 
@@ -70,10 +63,11 @@ Create revocation certs
 1. Export keys
    Replace $KEYID with your GPG key ID:
 ```bash
-gpg --export --armor  $KEYID  > $KEYID.pub.asc
-gpg --export-secret-keys --armor $KEYID > $KEYID.priv.asc
-gpg --export-secret-subkeys --armor $KEYID > $KEYID.sub_priv.asc
+gpg --armor --export  $KEYID  > $KEYID.pub.asc
+gpg --armor --export-secret-keys $KEYID > $KEYID.priv.asc
+gpg --armor --export-secret-subkeys $KEYID > $KEYID.sub_priv.asc
 gpg --export-ownertrust > ownertrust.txt
+gpg --armor --gen-revoke $KEYID > REVOKE-$KEYID.asc
 ```
 2. Import keys
 ```bash
