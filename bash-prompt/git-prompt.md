@@ -1,4 +1,5 @@
-```# uncomment for a colored prompt, if the terminal has the capability; turned
+```bash
+# uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
 #force_color_prompt=yes
@@ -15,7 +16,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 ```
 
-```
+```bash
 . ~/git-prompt.sh
 #export GIT_PS1_SHOWDIRTYSTATE=1
 #export PS1 '\w$(__git_ps1 " (%s)")\$ '
@@ -41,7 +42,7 @@ fi
 unset color_prompt force_color_prompt
 ```
 
-```
+```bash
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
