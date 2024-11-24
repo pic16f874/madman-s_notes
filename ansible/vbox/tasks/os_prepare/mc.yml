@@ -1,0 +1,9 @@
+- block:
+
+  - name: mc-ncdu | install required packages
+    ansible.builtin.package:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - mc
+      - ncdu

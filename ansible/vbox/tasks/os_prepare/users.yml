@@ -1,0 +1,67 @@
+- name: users | create system group
+  ansible.builtin.group:
+    name: sysusers
+    state: present
+
+#- name: Using dict2items
+#  ansible.builtin.debug:
+#    msg: "{{ item.username }} - {{ item.password }}"
+#  loop: "{{ sysusers | dict2items }}"
+
+- name: users | create users
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    #group: "{{ item }}"
+    groups: sysusers
+    shell: /bin/bash
+    state: present
+    password: "{{ item.password }}"
+  loop: "{{ sysusers }}"
+
+- name: users | give sudo access to backend group
+  ansible.builtin.blockinfile:
+    path: /etc/sudoers
+    insertafter: "root    ALL=(ALL)       ALL"
+    block: |
+      # Gives sudo access to the backend group
+      %sysusers        ALL=(ALL)       NOPASSWD: ALL
+
+#- name: L O O P   D E B U G   |  nested loop on subelements
+#  ansible.builtin.debug:
+#    msg: "=====    IDX {{ my_idx }}  ===  {{ item.0.username }}  === {{ item.1 }} "
+#  loop: "{{ sysusers | subelements('sshpubkeys') }}"
+#  loop_control:
+#    index_var: my_idx
+
+- name: users | set authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ item.0.username }}"
+    state: present
+    key: "{{ item.1 }}"
+  loop: "{{ sysusers | subelements('sshpubkeys') }}"
+
+- name: users | create .themes dir
+  ansible.builtin.file:
+    path:  "/home/{{ item.username }}/.themes"
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ sysusers }}"
+
+- name: users | add UA2 theme - select it in Window manager -> Style -> Theme -> UA2
+  ansible.builtin.unarchive:
+    src: "files/UA2-xfce-theme.tar.gz"
+    dest: "/home/{{ item.username }}/.themes"
+    #remote_src: yes
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    mode: '0755'
+  loop: "{{ sysusers }}"
+
+#- name: users | set theme
+#  ansible.builtin.lineinfile:
+#    path: /home/{{ item }}/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+#    regexp: '.*<property name="theme" type="string" value=".*"/>'
+#    line: '<property name="theme" type="string" value="UA2"/>'
+#  loop: "{{ sysusers }}"

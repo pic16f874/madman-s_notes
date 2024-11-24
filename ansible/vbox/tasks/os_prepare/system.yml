@@ -1,0 +1,13 @@
+#- name: system | disable root login over SSH
+#  ansible.builtin.lineinfile:
+#    dest: '/etc/ssh/sshd_config'
+#    regexp: '^PermitRootLogin'
+#    line: 'PermitRootLogin no'
+#    state: present
+
+#- name: system | disable password login
+#  ansible.builtin.lineinfile:
+#    dest: '/etc/ssh/sshd_config'
+#    regexp: '^PasswordAuthentication'
+#    line: 'PasswordAuthentication no'
+#    state: present

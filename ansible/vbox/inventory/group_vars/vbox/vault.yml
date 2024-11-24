@@ -1,0 +1,8 @@
+vault_ubuntu_usr_pwd: ubuntu235
+
+vault_sysusers:
+    - username: "mivanov"
+      password: "$6$X9ujXC9jLvw7y3KH$Q9QqUwzUzKr0BmVnq5dAllpIT3XKZFxlxwry0rhQuc6DlxKdU4s84dCIafoeySgB5Ef7lat4EtsDpwkfIw/WN."
+      sshpubkeys:
+        - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIARqEqpRAYjRelJeNBoQ/EMXU9gT+HQBKQ0e3lV+0kXU pic16f874@github.com'
+        - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIjyPGTttiCs4S4sqzv96W+NyzUPtO8+7/HiDOXoZdwD mykola.ivanov-ext@ledger.fr'
