@@ -3,11 +3,6 @@
     name: sysusers
     state: present
 
-#- name: Using dict2items
-#  ansible.builtin.debug:
-#    msg: "{{ item.username }} - {{ item.password }}"
-#  loop: "{{ sysusers | dict2items }}"
-
 - name: users | create users
   ansible.builtin.user:
     name: "{{ item.username }}"
