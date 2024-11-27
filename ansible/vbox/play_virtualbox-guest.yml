@@ -1,0 +1,5 @@
+---
+- name: virtualbox-guest
+  hosts: all
+  roles:
+    - role-virtualbox-guest
