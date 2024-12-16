@@ -1,5 +1,8 @@
 ### Ansible
 
+`vboxmanage list vms | grep '"XU2404"'`
+`vboxmanage showvminfo 53fe2787-62ce-4e59-ba3a-e853f352a6a4 --machinereadable | grep 'Forwarding.*=\"SSH' `
+
 This ansible folder aims to deploy and configure new `Ubuntu in Virtual Box` .
 
 `ans-vlt-pwd: M....1...4`
@@ -9,6 +12,7 @@ This ansible folder aims to deploy and configure new `Ubuntu in Virtual Box` .
 `ansible-vault edit --vault-password-file ../../../ans-vlt-pwd inventory/group_vars/vbox/vault.yml`
 
 `ansible-playbook play_os_prepare.yaml -i inventory --list-hosts --list-tasks --limit=acc-1,acc-2`
+
 `ansible-playbook --vault-password-file ../../../ans-vlt-pwd play_os_prepare.yaml -i inventory --limit=acc-1`
 -----
 playbook rely that sshd installed and NAT port forwarding configured

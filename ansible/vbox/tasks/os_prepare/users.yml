@@ -7,7 +7,10 @@
   ansible.builtin.user:
     name: "{{ item.username }}"
     #group: "{{ item }}"
-    groups: sysusers
+    groups:
+       - sysusers
+       - vboxsf
+#       - sambashare
     shell: /bin/bash
     state: present
     password: "{{ item.password }}"
@@ -18,7 +21,7 @@
     path: /etc/sudoers
     insertafter: "root    ALL=(ALL)       ALL"
     block: |
-      # Gives sudo access to the backend group
+      # Gives sudo access to the sysusers group
       %sysusers        ALL=(ALL)       NOPASSWD: ALL
 
 #- name: L O O P   D E B U G   |  nested loop on subelements
@@ -35,28 +38,105 @@
     key: "{{ item.1 }}"
   loop: "{{ sysusers | subelements('sshpubkeys') }}"
 
-- name: users | create .themes dir
+- name: create Desktop dir
   ansible.builtin.file:
-    path:  "/home/{{ item.username }}/.themes"
-    owner: "{{ item.username }}"
-    group: "{{ item.username }}"
+    path: "/home/{{ item.username }}/Desktop/"
     state: directory
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
     mode: '0755'
   loop: "{{ sysusers }}"
+- name:  users | Copy a desktopfiles files
+  ansible.builtin.copy:
+    src: "files/desktop-shortcuts/{{ item.1 }}"
+    dest: "/home/{{ item.0.username }}/Desktop/{{ item.1 }}"
+    owner: "{{ item.0.username }}"
+    group: "{{ item.0.username }}"
+    mode: '0755'
+  loop: "{{ sysusers | subelements('desktopfiles') }}"
 
-- name: users | add UA2 theme - select it in Window manager -> Style -> Theme -> UA2
-  ansible.builtin.unarchive:
-    src: "files/UA2-xfce-theme.tar.gz"
-    dest: "/home/{{ item.username }}/.themes"
-    #remote_src: yes
+- name: create Panel dir
+  ansible.builtin.file:
+    path: "/home/{{ item.username }}/.config/xfce4/panel/launcher-11"
+    state: directory
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    mode: '0755'
+  loop: "{{ sysusers }}"
+- name:  users | Copy a desktopfiles files
+  ansible.builtin.copy:
+    src: "files/desktop-shortcuts/{{ item.1 }}"
+    dest: "/home/{{ item.0.username }}/.config/xfce4/panel/launcher-11/{{ item.1 }}"
+    owner: "{{ item.0.username }}"
+    group: "{{ item.0.username }}"
+    mode: '0755'
+  loop: "{{ sysusers | subelements('desktopfiles') }}"
+
+- name: users | add TOTP
+  ansible.builtin.lineinfile:
+    path: "/home/{{ item.username }}/Desktop/TOTP.sh"
+    create: true
+    regexp: '^$'
+    line: "oathtool -b --totp {{ 'otp' | extract ( inventory_hostname | extract( usr_prof, morekeys='gmail' ) ) }}"
     owner: "{{ item.username }}"
     group: "{{ item.username }}"
     mode: '0755'
   loop: "{{ sysusers }}"
 
-#- name: users | set theme
-#  ansible.builtin.lineinfile:
-#    path: /home/{{ item }}/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
-#    regexp: '.*<property name="theme" type="string" value=".*"/>'
-#    line: '<property name="theme" type="string" value="UA2"/>'
+
+- name: users | create theme dir
+  ansible.builtin.file:
+    path: "/home/{{ item.username }}/.config/xfce4/xfconf/xfce-perchannel-xml"
+    state: directory
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    mode: '0755'
+  loop: "{{ sysusers }}"
+#/etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+- name: users | set theme | copy template
+  ansible.builtin.copy:
+    src: "/etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+    dest: "/home/{{ item.username }}/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+    force: false
+    remote_src : true
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    mode: '0755'
+  loop: "{{ sysusers }}"
+- name: users | set theme
+  ansible.builtin.lineinfile:
+    path: /home/{{ item.username }}/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+    regexp: '.*<property name="theme" type="string" value=".*"/>'
+    line: '<property name="theme" type="string" value="UA2"/>'
+  loop: "{{ sysusers }}"
+  ignore_errors: yes
+
+#  cd ~;tar -czf /media/sf_VBoxShared/{{prof_name}}/webbkp-`date -I`.tgz .mozilla/firefox/* .config/google-chrome/* .config/discord/*
+#mkdir -p /media/sf_VBoxShared/${HOSTNAME};cd ~;tar -czf /media/sf_VBoxShared/${HOSTNAME}/webbkp-`date -I`.tgz .mozilla/firefox/* .config/google-chrome/* .config/discord/*
+
+
+#- name: create subdirs in VBoxShared dir .mozilla
+#  ansible.builtin.file:
+#    path: "/media/sf_VBxShCfg/{{ item.username }}/.mozilla"
+#    owner: "{{ item.username }}"
+#    group: "{{ item.username }}"
+#    mode: '0755'
+#    state: directory
+#  loop: "{{ sysusers }}"
+#- name: create symlinks to VBoxShared dir
+#  ansible.builtin.file:
+#    dest:  "/home/{{ item.username }}/.mozilla"
+#    src: "/media/sf_VBxShCfg/{{ item.username }}/.mozilla"
+#    state: link
+#  loop: "{{ sysusers }}"
+
+
+#- name: Install a FIREFOX package from the internet
+#  ansible.builtin.get_url:
+#    url: https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US
+#    dest: /home/{{ item.username }}/firefox.tar.bz2
+#    decompress: false
+##    owner: "{{ item.username }}"
+##    group: "{{ item.username }}"
+##    mode: '0755'
 #  loop: "{{ sysusers }}"

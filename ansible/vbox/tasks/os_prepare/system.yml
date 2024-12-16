@@ -11,3 +11,42 @@
 #    regexp: '^PasswordAuthentication'
 #    line: 'PasswordAuthentication no'
 #    state: present
+
+- name: users | add UA2 theme - select it in Window manager -> Style -> Theme -> UA2
+  ansible.builtin.unarchive:
+    src: "files/UA2-xfce-theme.tar.gz"
+    dest: "/usr/share/themes/"
+    owner: "root"
+    group: "root"
+    mode: '0755'
+
+- name: mc-ncdu | install required packages
+  ansible.builtin.package:
+      name: "{{ item }}"
+      state: present
+  loop:
+      - mc
+      - ncdu
+      - bzip2
+      - tar
+      - htop
+      - git
+      - curl
+      - oathtool
+      - mousepad
+
+- name: Install a DISCORD package from the internet
+  ansible.builtin.apt:
+    deb: https://discordapp.com/api/download?platform=linux&format=deb
+    #deb: https://dl.discordapp.net/apps/linux/0.0.77/discord-0.0.77.deb
+
+
+- name: Install a CHROME package from the internet
+  ansible.builtin.apt:
+    deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+- name: Download and Unarchive firefox
+  ansible.builtin.unarchive:
+    src: https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US
+    dest: /usr/lib
+    remote_src: yes

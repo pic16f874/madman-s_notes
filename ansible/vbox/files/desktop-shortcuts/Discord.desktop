@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Icon=discord
+Name=Discord
+Exec=/usr/share/discord/Discord
+Path=/usr/bin

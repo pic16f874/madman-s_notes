@@ -1,3 +1,4 @@
+vault_host_usr_home: '/home/m-ivanov'
 vault_ubuntu_usr_pwd: ubuntu235
 
 vault_sysusers:
@@ -6,3 +7,86 @@ vault_sysusers:
       sshpubkeys:
         - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIARqEqpRAYjRelJeNBoQ/EMXU9gT+HQBKQ0e3lV+0kXU pic16f874@github.com'
         - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIjyPGTttiCs4S4sqzv96W+NyzUPtO8+7/HiDOXoZdwD mykola.ivanov-ext@ledger.fr'
+      desktopfiles:
+        - 'Discord.desktop'
+        - 'Firefox.desktop'
+        - 'Google-Chrome.desktop'
+        - 'terminal.desktop'
+        - 'backup.sh'
+        - 'restore.sh'
+
+#- name: Example how to read from usr_prof
+#  ansible.builtin.debug:
+#     msg:
+#        - "{{ inventory_hostname | extract( usr_prof, morekeys='prof_name' ) }}"
+#        - "{{ 'acc' | extract ( inventory_hostname | extract( usr_prof, morekeys='gmail' ) ) }}"
+# https://www.middlewareinventory.com/blog/ansible-map/
+
+
+
+vault_usr_prof:
+        XU2404-11:
+           prof_name: acc1-mykoinv6707663
+           gmail:
+             acc: mykoinv@gmail.com
+             pwd: GM-DzKb533Pav4uVZtk
+             otp: 6K7DIVKYC7L2HI7BDNUQN5T6UIZCEGFC
+
+        XU2404-12:
+           prof_name: acc2-minv5725495
+           gmail:
+             acc: minv5725495@gmail.com
+             pwd: eQL9Pf67YQe4DPL
+             otp: A44SE2O35L4O2KGXKUAZ6F3HG3AQ5AX3
+           ssh:
+             pubkey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII/AACxI5/ng0TTmXR6HG6RJll22tycAkWd6EVM1Jsvu minv5725495'
+             sshprvkey: |
+                 -----BEGIN OPENSSH PRIVATE KEY-----
+                 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+                 QyNTUxOQAAACCPwAAsSOf54NE05l0ehxukSZZdtrcnAJFnehFTNSbL7gAAAJhVDHbUVQx2
+                 1AAAAAtzc2gtZWQyNTUxOQAAACCPwAAsSOf54NE05l0ehxukSZZdtrcnAJFnehFTNSbL7g
+                 AAAEDnt9Em3Aj96DFunwg9YmKcnBhJ0RRH6BAin2zZEAYteY/AACxI5/ng0TTmXR6HG6RJ
+                 ll22tycAkWd6EVM1JsvuAAAAFG1pbnY1NzI1NDk1QExhdC01NTIxAQ==
+                 -----END OPENSSH PRIVATE KEY-----
+
+        XU2404-13:
+           prof_name: acc3-ni3.2839574
+           gmail:
+             acc: ni3.2839574@gmail.com
+             pwd: GM-2839574-fji02maZ
+             otp: QYJQ7MB6FHSALQU5THWVYMZ73MU3WW5B
+
+        XU2404-14:
+           prof_name: acc4-my4.2492871
+           gmail:
+             acc: my4.2492871@gmail.com
+             pwd: GM-umc2492871-fji02maZ
+             otp: FWL2JV6QBS7UAF33NRV55EUNF77TJLDP
+
+        XU2404-15:
+           prof_name: acc5-nino4136017
+           gmail:
+             acc: nino4136017@gmail.com
+             pwd: GM-IRRiw5OMAjEm9t9s7TsF
+             otp: PCB4TJEXFK4G45IRQ5N6QPVIU4YBCTIS
+
+        XU2404-16:
+           prof_name: acc6-toly4136018
+           gmail:
+             acc: toly4136018@gmail.com
+             pwd: GM-HWwxmPSYY3CqIbJsdPe3
+             otp: KPFENUMB5JVRVHLW5ZRSPJJQRMVR4CTO
+
+        XU2404-17:
+           prof_name: acc7-vikt4136042
+           gmail:
+             acc: vikt4136042@gmail.com
+             pwd: GM-JvdSgtktx3eXQkAE
+             otp: EDDJJ4XIP6JONFFV5RZZG25R2SX5WCLO
+
+        XU2404-18:
+           prof_name: acc8-vera4136029
+           gmail:
+             acc: vera4136029@gmail.com
+             pwd: GM-4LqskklT6BLa1MKQro
+             otp: PSY7YIZF7SGQNBZA3RL373PCCX64UAIL

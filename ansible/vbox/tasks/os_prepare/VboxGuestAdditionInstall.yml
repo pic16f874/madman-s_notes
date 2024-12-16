@@ -1,0 +1,183 @@
+# ---
+# # defaults file for virtualbox-guest
+# virtualbox_iso: /root/VBoxGuestAdditions.iso
+# virtualbox_os_packages:
+#   - virtualbox-guest-additions-iso
+#   - virtualbox-guest-dkms
+#   - virtualbox-guest-source
+#   - virtualbox-guest-utils
+#   - virtualbox-guest-x11
+# virtualbox_remove_os_packages: false
+# virtualbox_version: auto
+
+# tasks file for virtualbox-guest
+
+- name: print regex_search
+  ansible.builtin.debug:
+    msg: "{{ inventory_hostname | regex_search('[0-9]{1,4}') }}"
+
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: "vbox-{{ inventory_hostname }}"
+    use: "debian"
+  ignore_errors: yes
+
+- name: Remove OS installation of virtualbox guest additions
+  package:
+    name: "{{ virtualbox_os_packages }}"
+    state: absent
+  when: virtualbox_remove_os_packages is defined and virtualbox_remove_os_packages
+
+- block:
+    - name: Determine the host version
+      ansible.builtin.shell:  "VBoxManage --version | awk -F'[r_]' '{print $1}'"
+      delegate_to: localhost
+      register: host_vbox_version
+      become: no
+
+    - name: Check if virtualbox_version could be determined
+      ansible.builtin.fail:
+        msg: "Could not determine virtualbox_version - please specify this variable"
+      when: not host_vbox_version.stdout
+
+    - name: Override virtualbox_version if defaults set to auto
+      ansible.builtin.set_fact:
+        virtualbox_version: "{{ host_vbox_version.stdout }}"
+
+    - name: print host_vbox_version
+      ansible.builtin.debug:
+        msg: "{{ host_vbox_version }}"
+
+  when: virtualbox_version == "auto"
+
+
+#- name: attach  ISO emptydrive  you can run this command only on stopped vm
+#  ansible.builtin.shell: "vboxmanage storageattach {{ vbox_vm_uuid }} --storagectl \"SATA\" --port 1 --type dvddrive --medium emptydrive"
+#  delegate_to: localhost
+#  become: no
+#  ignore_errors: yes
+
+- name: attach  ISO additions | cdrom --storagectl IDE --port 1 --device 0 --type dvddrive  --medium emptydrive  must be attached
+  #ansible.builtin.shell: "vboxmanage storageattach bc55452d-476d-4cb6-bbfd-6482f79dd587 --storagectl IDE --port 1 --device 0 --type dvddrive --medium additions"
+  ansible.builtin.shell: "vboxmanage storageattach {{ vbox_vm_uuid }} --storagectl IDE --port 1 --device 0 --type dvddrive --medium additions"
+  delegate_to: localhost
+  become: no
+  ignore_errors: yes
+
+- name: Check if VBoxGuest additions ISO is mounted
+  ansible.builtin.shell: mount -l 2>/dev/null|awk 'tolower($0) ~ /vbox.*additions/{print $3}'
+  register: mount_path
+
+- name: Mount VBoxGuestAdditions
+  ansible.posix.mount:
+    name: /media/cdrom
+    src: "{{ ISO_path }}"
+    fstype: iso9660
+    opts: noauto
+    state: mounted
+  register: mounted_ISO
+#  when: mount_path is defined and not mount_path.stdout
+
+- name: Check if VBoxGuest additions ISO is mounted
+  ansible.builtin.shell: mount -l 2>/dev/null|awk 'tolower($0) ~ /vbox.*additions/{print $3}'
+  register: mount_path
+
+#- name: Save the current list of packages for Debians
+#  block:
+#    - name: Query current list
+#      shell: dpkg-query -l > /tmp/before.txt
+#      when: virtualbox_keep is undefined or not virtualbox_keep
+
+#    - name: Install kernel headers for Debian
+#      apt:
+#        name: linux-headers-{{ ansible_kernel }}
+#        update_cache: yes
+#        cache_valid_time: 86400
+#        install-recommends: no
+#        state: present
+
+#  when: ansible_os_family == "Debian"
+
+
+- name: Install necessary packages for compiling
+  package:
+    name: ["bzip2", "dkms", "gcc", "make"]
+    state: present
+
+- name: Uninstall previous VBoxGuestAdditions
+  ansible.builtin.shell: echo "yes" | /media/cdrom/VBoxLinuxAdditions.run uninstall
+#  when: vbox_guest_version.stdout is defined
+  ignore_errors: yes
+
+- name: Build and install x11 VBoxGuestAdditions from file
+  ansible.builtin.shell: /media/cdrom/VBoxLinuxAdditions.run
+#  when: virtualbox_x11 is defined and virtualbox_x11
+  ignore_errors: yes
+
+#- name: Build and install VBoxGuestAdditions from file for Debians
+#  shell: /media/cdrom/VBoxLinuxAdditions.run --nox11
+#  when: ( virtualbox_x11 is undefined or not virtualbox_x11 ) and ansible_os_family == "Debian"
+#  ignore_errors: yes
+
+- name: Unmount VBoxGuestAdditions
+  ansible.posix.mount:
+    name: "{{ mount_path.stdout }}"
+    src: "{{ ISO_path }}"
+    fstype: iso9660
+    state: unmounted
+  when: mounted_ISO is changed
+
+- name: Set clipboard mode
+  ansible.builtin.shell: "vboxmanage controlvm  {{ vbox_vm_uuid }}  clipboard mode bidirectional"
+  delegate_to: localhost
+  become: no
+  ignore_errors: yes
+
+- name: Unconditionally shut down the machine with all defaults
+  community.general.shutdown:
+
+#- name: Shutdown VM | press acpipowerbutton
+#  ansible.builtin.shell: "vboxmanage controlvm  {{ vbox_vm_uuid }}  acpipowerbutton"
+#  delegate_to: localhost
+#  become: no
+#  ignore_errors: yes
+
+- name: Pause for 10 seconds
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: Set Fact ---  ext_config_dir
+  ansible.builtin.set_fact:
+    ext_common_dir: "{{ host_usr_home }}/VBoxShared"
+#    ext_config_dir: "{{ host_usr_home }}/VBoxShared/{{ inventory_hostname | extract( usr_prof, morekeys='prof_name' ) }}"
+
+#- name: create VBoxShared dir
+#  ansible.builtin.file:
+#    path: "{{ ext_config_dir }}"
+#    state: directory
+##    owner: "{{ item.username }}"
+##    group: "{{ item.username }}"
+##    mode: '0755'
+#  delegate_to: localhost
+#  become: no
+#  ignore_errors: yes
+
+- name: Add Shared folder (common)
+  ansible.builtin.shell: >
+        vboxmanage sharedfolder add {{ vbox_vm_uuid }}
+        --name VBoxShared --hostpath {{ ext_common_dir }}
+  delegate_to: localhost
+  become: no
+  ignore_errors: yes
+
+#- name: Add Shared folder (special)
+#  ansible.builtin.shell: >
+#        vboxmanage sharedfolder add {{ vbox_vm_uuid }}
+#        --name VBxShCfg --hostpath {{ ext_config_dir }}
+#  delegate_to: localhost
+#  become: no
+#  ignore_errors: yes
+
+#- name: Pause for 60 seconds
+#  ansible.builtin.pause:
+#    seconds: 60

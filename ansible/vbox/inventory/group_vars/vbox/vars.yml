@@ -1,2 +1,16 @@
+host_usr_home: "{{ vault_host_usr_home }}"
+
 ubuntu_usr_pwd: "{{ vault_ubuntu_usr_pwd }}"
+
+
 sysusers: "{{ vault_sysusers }}"
+usr_prof: "{{ vault_usr_prof }}"
+
+virtualbox_version: "auto"
+ISO_path: '/dev/cdrom'
+
+
+ansible_port: 2222
+ansible_user: ubuntu
+ansible_password: "{{ ubuntu_usr_pwd }}"
+ansible_become_password: "{{ ubuntu_usr_pwd }}"

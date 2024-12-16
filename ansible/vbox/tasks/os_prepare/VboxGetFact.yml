@@ -1,0 +1,47 @@
+- name: Creating fact for ssh fwd rule
+  ansible.builtin.set_fact:
+#    ip_bcd: "127.{{ ( inventory_hostname | regex_search('([0-9])([0-9])([0-9])([0-9])(_)([0-9]{2})', '\\2', '\\4', '\\6') ) | join('.') }}"
+    ansible_host: "127.{{ ( inventory_hostname | regex_search('([0-9]{2})([0-9]{2})(\\-)([0-9]{2})', '\\1', '\\2', '\\4') ) | join('.') }}"
+
+- name: Creating fact for ssh fwd rule
+  ansible.builtin.set_fact:
+    ans_ssh_rule: "ans-ssh,tcp,{{ ansible_host }},2222,,22"
+
+- name: Determine the host uuid
+  ansible.builtin.shell:  "vboxmanage list vms | awk '/\"{{ inventory_hostname }}\"/ { print $2 }'"
+  register: host_vbox_uuid
+  delegate_to: localhost
+  become: no
+
+- name: Creating fact for VM UUID
+  ansible.builtin.set_fact:
+    vbox_vm_uuid: "{{ host_vbox_uuid.stdout }}"
+
+#- name:  VM UUID
+#  ansible.builtin.debug:
+#    msg: "{{ host_vbox_uuid.stdout }}"
+
+- name: Delete vbox ssh fwd rule
+  ansible.builtin.shell: "vboxmanage controlvm  {{ host_vbox_uuid.stdout }} natpf1 delete \"ans-ssh\""
+  delegate_to: localhost
+  become: no
+  ignore_errors: yes
+#  VBoxManage controlvm <uuid | vmname> natpfN delete <rulename>
+#  VBoxManage controlvm <uuid | vmname> natpfN <[rulename] ,tcp | udp, host-IP, hostport, guest-IP, guestport>
+- name: Create vbox ssh fwd rule
+  ansible.builtin.shell: vboxmanage controlvm {{ host_vbox_uuid.stdout }} natpf1 " {{ ans_ssh_rule }} "
+  delegate_to: localhost
+  become: no
+  ignore_errors: yes
+
+
+#vboxmanage list vms | grep '"XU2404"'
+
+#vboxmanage showvminfo 53fe2787-62ce-4e59-ba3a-e853f352a6a4 --machinereadable | grep 'Forwarding.*=\"SSH'
+
+#  VBoxManage controlvm <uuid | vmname> natpfN <[rulename] ,tcp | udp, host-IP, hostport, guest-IP, guestport>
+#  VBoxManage controlvm <uuid | vmname> natpfN delete <rulename>
+#  VBoxManage controlvm <uuid | vmname> acpipowerbutton
+#  VBoxManage controlvm <uuid | vmname> reboot
+
+#VBoxManage controlvm "VM name" natpf1 "guestssh,tcp,,2222,,22"

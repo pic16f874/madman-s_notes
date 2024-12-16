@@ -1,5 +1,9 @@
----
-- name: virtualbox-guest
-  hosts: all
-  roles:
-    - role-virtualbox-guest
+- name: Install VBoxGuestAdditions
+  hosts: grp_vbox
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: facts
+      ansible.builtin.include_tasks: tasks/os_prepare/VboxGetFact.yml
+    - name: install guest additions
+      ansible.builtin.include_tasks: tasks/os_prepare/VboxGuestAdditionInstall.yml
